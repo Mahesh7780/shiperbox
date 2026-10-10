@@ -237,10 +237,14 @@ router.post("/checkout", requireUser, async (req, res) => {
   if (isNaN(deliveryDateObj.getTime()) || deliveryDateObj < todayStart) {
     return res.status(400).json({ success: false, message: "Please choose a valid, upcoming delivery date." });
   }
-  if (typeof total_price !== "number" || !(total_price > 0)) {
+  let safe_total_price = total_price;
+  if (typeof safe_total_price !== "number" || !(safe_total_price > 0)) {
     return res.status(400).json({ success: false, message: "Invalid order total." });
   }
-  if (total_price < MIN_ORDER_VALUE) {
+  
+  safe_total_price = Math.round(safe_total_price); // Fix floating point issues
+  
+  if (safe_total_price < MIN_ORDER_VALUE) {
     return res.status(400).json({ success: false, message: `Minimum order value is ₹${MIN_ORDER_VALUE}. Please add more items to your cart.` });
   }
 
